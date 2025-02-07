@@ -1,8 +1,8 @@
 #include <stdio.h>
-#include <stdlib.h>
+#include<stdlib.h>
 
 
-
+//windows-msvc-x64
 #define V 'X'
 #define M '.'
 #define MAXL 100
@@ -42,7 +42,7 @@ void inicSapo(char m[ ][MAXC], int nL, int nC);
 void inicGlider(char m[ ][MAXC], int nL, int nC);
 void inicLWSS(char m[ ][MAXC], int nL, int nC);
 
-//Atencao!!!! Nas etapa 1b de desenvolvimento vc pode  alterar esse protótipo, sua respectiva chamada e definição
+//Atencao!!!! Nas etapa 1b de desenvolvimento vc pode  alterar esse protï¿½tipo, sua respectiva chamada e definiï¿½ï¿½o
 int menuInicJogo(char m[ ][MAXC], int nL, int nC);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -51,7 +51,7 @@ int menuInicJogo(char m[ ][MAXC], int nL, int nC);
 
 
 
-//////////////////////////////////////////////// Início da parte a ser alterada na etapa 1b   ///////////////////////////////////
+//////////////////////////////////////////////// Inï¿½cio da parte a ser alterada na etapa 1b   ///////////////////////////////////
 
 int main()
 {
@@ -73,7 +73,7 @@ int main()
         op = menuInicJogo(tab,nL,nC);
         printf("iniciando jogo com opcao %d\n\n", op);
         DORME(TEMPO);
-        jogaJogoVida(tab,nL,nC,nCiclos); //Etapa 1a: complete essa funcao no trecho de sua definição
+        jogaJogoVida(tab,nL,nC,nCiclos); //Etapa 1a: complete essa funcao no trecho de sua definiï¿½ï¿½o
 
   //fim do laco indeterminado
 
@@ -100,7 +100,7 @@ int  menuInicJogo(char mat[ ][MAXC], int nL, int nC)
 
     imprimeMatriz(mat,nL,nC);
     printf("Se inicializacao correta digite qualquer tecla para iniciar o jogo...");
-    while(getchar()!='\n'); //limpa a memória do teclado (caso tenha sobrado ENTER (\n)
+    while(getchar()!='\n'); //limpa a memï¿½ria do teclado (caso tenha sobrado ENTER (\n)
     getchar();
 
     return opcao;
@@ -114,20 +114,87 @@ int  menuInicJogo(char mat[ ][MAXC], int nL, int nC)
 
 void imprimeMatriz(char m[][MAXC],int nL, int nC)
 {
-
-    //Etapa 1a: completar aqui...
+    int i , j;
+    for(i = 0 ; i < nL ; i++)
+    {
+        for(j = 0 ; j < nC ; j++)
+        {
+            printf("%c " , m[i][j]);
+        }
+      printf("\n");
+    }
 }
 
 void copiaMatriz(char mCopia[][MAXC],char m[][MAXC], int nL, int nC)
 {
 
-    //Etapa 1a: completar aqui...
-
+    int i , j;
+    for(i = 0 ; i < nL ; i++)
+    {
+        for(j = 0 ; j < nC ; j++)
+        {
+           mCopia[i][j] = m[i][j];
+        }
+    }
 }
 
 void atualizaMat(char mAtual[][MAXC], char mAnterior[][MAXC], int nL, int nC)
 {
-     //Etapa 1a: completar aqui...
+  int i , j , vivos , l , c , vizinhoLinha , vizinhoColuna;
+
+  for(i = 0 ; i < nL ; i++)
+  {
+    for(j = 0 ; j < nC ; j++)
+    {
+      vivos = 0;
+      for (l = -1; l <= 1; l++) 
+      {
+        for (c = -1; c <= 1; c++) 
+        {
+          vizinhoLinha = i + l;
+          vizinhoColuna = j + c;
+          
+
+          if(l != 0 || c != 0)
+          {       
+            if (vizinhoLinha >= 0 && vizinhoLinha < nL && vizinhoColuna >= 0 && vizinhoColuna < nC) 
+            {
+              if (mAnterior[vizinhoLinha][vizinhoColuna] == 'X') 
+              {
+                vivos++;
+              }
+            }
+          }
+        }
+      }
+
+    if (mAnterior[i][j] == 'X')
+    {
+      if (vivos < 2 || vivos > 3) 
+      {
+        mAtual[i][j] = '.'; 
+      }
+
+      else
+      {
+        mAtual[i][j] = 'X';
+      }
+    } 
+            
+    else 
+    {
+      if (vivos == 3) 
+      {
+        mAtual[i][j] = 'X'; 
+      }
+
+      else
+      {
+        mAtual[i][j] = '.';
+      }
+     }
+   }
+ }
 
 }
 
@@ -169,7 +236,7 @@ void limpaMatriz(char m[ ][MAXC], int nL, int nC)
     int i,j;
     for(i=0;i<nL;i++)
      for(j=0;j<nC;j++)
-        m[i][j]=M;  // cada célula eh preenchida como morta M ('.')
+        m[i][j]=M;  // cada cï¿½lula eh preenchida como morta M ('.')
 }
 
 ////////////////////////////////////////////////
@@ -179,7 +246,7 @@ void inicBloco(char m[ ][MAXC], int nL, int nC)
   int i,j,xInic=nL/2, yInic=nC/2;
 
 
- //posiciona o padrão no tabuleiro
+ //posiciona o padrï¿½o no tabuleiro
  for(i=0;i<2;i++)
     for(j=0;j<2;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
@@ -192,7 +259,7 @@ void inicBote(char m[ ][MAXC], int nL, int nC)
   int i,j,xInic=nL/2, yInic=nC/2;
 
 
- //posiciona o padrão no tabuleiro
+ //posiciona o padrï¿½o no tabuleiro
  for(i=0;i<3;i++)
     for(j=0;j<3;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
@@ -204,7 +271,7 @@ void inicBlinker(char m[ ][MAXC], int nL, int nC)
   int i,j, xInic=nL/2, yInic=nC/2;
 
 
- //posiciona o padrão no tabuleiro
+ //posiciona o padrï¿½o no tabuleiro
  for(i=0;i<1;i++)
     for(j=0;j<3;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
@@ -219,7 +286,7 @@ void inicSapo(char m[ ][MAXC], int nL, int nC)
   int i,j,xInic=nL/2, yInic=nC/2;
 
 
-  //posiciona o padrão no tabuleiro
+  //posiciona o padrï¿½o no tabuleiro
    for(i=0;i<2;i++)
       for(j=0;j<4;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
@@ -236,7 +303,7 @@ char padrao[3][3]={{V,V,V},{V,M,M},{M,V,M}};
  xInic=nL-4;
  yInic=nC-4;
 
- //posiciona o padrão no tabuleiro
+ //posiciona o padrï¿½o no tabuleiro
  for(i=0;i<3;i++)
     for(j=0;j<3;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
@@ -253,7 +320,7 @@ char padrao[4][5]={{M,V,M,M,V},{V,M,M,M,M},{V,M,M,M,V},{V,V,V,V,M}};
  xInic=nL-5;
  yInic=nC-6;
 
- //posiciona o padrão no tabuleiro
+ //posiciona o padrï¿½o no tabuleiro
  for(i=0;i<4;i++)
     for(j=0;j<5;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
