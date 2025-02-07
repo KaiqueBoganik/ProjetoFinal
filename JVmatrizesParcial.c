@@ -137,66 +137,96 @@ void copiaMatriz(char mCopia[][MAXC],char m[][MAXC], int nL, int nC)
         }
     }
 }
+int verificarVivos(char matriz[][MAXC] , int linhas , int colunas)
+{
+    int i , j , vivos = 0;
+
+    for(i = 0 ; i < linhas ; i++)
+    {
+      for(j = 0 ; j < colunas ; j++)
+      {
+        if (j + 1 < colunas && matriz[i][j + 1] == 'X')
+        { 
+          vivos++; 
+        }
+
+        if (j - 1 >= 0 && matriz[i][j - 1] == 'X')
+        { 
+          vivos++; 
+        }
+
+        if (i + 1 < linhas && matriz[i + 1][j] == 'X') 
+        {
+          vivos++; 
+        }
+
+        if (i - 1 >= 0 && matriz[i - 1][j] == 'X') 
+        {
+          vivos++; 
+        }
+
+        if (i - 1 >= 0 && j - 1 >= 0 && matriz[i - 1][j - 1] == 'X')
+        { 
+          vivos++; 
+        }
+        if (i - 1 >= 0 && j + 1 < colunas && matriz[i - 1][j + 1] == 'X') 
+        {
+          vivos++;
+        }
+
+        if (i + 1 < linhas && j - 1 >= 0 && matriz[i + 1][j - 1] == 'X') 
+        {
+          vivos++;
+        }
+
+        if (i + 1 < linhas && j + 1 < colunas && matriz[i + 1][j + 1] == 'X')
+        { 
+          vivos++; 
+        }
+      }
+    }
+  return vivos;
+}
 
 void atualizaMat(char mAtual[][MAXC], char mAnterior[][MAXC], int nL, int nC)
 {
-  int i , j , vivos , l , c , vizinhoLinha , vizinhoColuna;
+  int i , j , vivos;
 
   for(i = 0 ; i < nL ; i++)
   {
     for(j = 0 ; j < nC ; j++)
     {
-      vivos = 0;
-      for (l = -1; l <= 1; l++) 
+      vivos = verificarVivos(mAnterior[i][j] , nL , nC);
+
+      if (mAnterior[i][j] == 'X')
       {
-        for (c = -1; c <= 1; c++) 
+        if (vivos < 2 || vivos > 3) 
         {
-          vizinhoLinha = i + l;
-          vizinhoColuna = j + c;
-          
-
-          if(l != 0 || c != 0)
-          {       
-            if (vizinhoLinha >= 0 && vizinhoLinha < nL && vizinhoColuna >= 0 && vizinhoColuna < nC) 
-            {
-              if (mAnterior[vizinhoLinha][vizinhoColuna] == 'X') 
-              {
-                vivos++;
-              }
-            }
-          }
+          mAtual[i][j] = '.'; 
         }
-      }
 
-    if (mAnterior[i][j] == 'X')
-    {
-      if (vivos < 2 || vivos > 3) 
-      {
-        mAtual[i][j] = '.'; 
-      }
-
-      else
-      {
-        mAtual[i][j] = 'X';
-      }
-    } 
+        else
+        {
+          mAtual[i][j] = 'X';
+        }
+      } 
             
-    else 
-    {
-      if (vivos == 3) 
+      else 
       {
-        mAtual[i][j] = 'X'; 
-      }
+        if (vivos == 3) 
+        {
+          mAtual[i][j] = 'X'; 
+        }
 
-      else
-      {
-        mAtual[i][j] = '.';
-      }
+        else
+        {
+          mAtual[i][j] = '.';
+        }
      }
-   }
- }
-
+    }
+  }
 }
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// FIM da Parte a ser completada ///////////////////////////////////
