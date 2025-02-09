@@ -41,6 +41,7 @@ void inicBlinker(char m[ ][MAXC], int nL, int nC);
 void inicSapo(char m[ ][MAXC], int nL, int nC);
 void inicGlider(char m[ ][MAXC], int nL, int nC);
 void inicLWSS(char m[ ][MAXC], int nL, int nC);
+void inicAleat(char m[ ][MAXC], int nL, int nC);
 
 //Atencao!!!! Nas etapa 1b de desenvolvimento vc pode  alterar esse prot�tipo, sua respectiva chamada e defini��o
 int menuInicJogo(char m[ ][MAXC], int nL, int nC);
@@ -58,22 +59,28 @@ int main()
 
    char tab[MAXL][MAXC];
 
-   int nL=20,nC=20,nCiclos=50; //ou fornecidos pelo usuario
+   int nL,nC,nCiclos; //ou fornecidos pelo usuario
    int op; //opcao fornecida pelo usuario e retornada pela funcao menuInicJogo
+   int continuar = 1 , escolha;
 
+   printf("Digite o tamanho do tabuleiro:\n");
+   scanf("%d %d" , &nL , &nC);
+   printf("Digite quantas vezes deseja ver:\n");
+   scanf("%d" , &nCiclos);
 
-
-   //Etapa 1b: implementar laco INdeterminado que repete enquanto o usuario quiser continuar jogando:
-      //cada jogo equivale a nCiclos de um padrao de inicializacao
-      //por exemplo o usuario pode escolher jogar nCiclos do padrao Sapo
-     // quando terminar ele pode
-     // encerrar o programa
-     // ou jogar mais nCiclos de outro padrao qualquer escolhido no menu
-
+    while(continuar)
+    {
         op = menuInicJogo(tab,nL,nC);
         printf("iniciando jogo com opcao %d\n\n", op);
         DORME(TEMPO);
         jogaJogoVida(tab,nL,nC,nCiclos); //Etapa 1a: complete essa funcao no trecho de sua defini��o
+        printf("Deseja continuar jogando?\n (1)Sim \n (2)Não\n");
+        scanf("%d" , &escolha);
+
+        if(escolha == 2)
+            continuar = 0;
+
+    }
 
   //fim do laco indeterminado
 
@@ -86,8 +93,8 @@ int  menuInicJogo(char mat[ ][MAXC], int nL, int nC)
 
    limpaMatriz(mat,nL,nC);
 
-   printf("(1)Bloco\n(2)Bote\n(3)Blinker\n(4)Sapo\n(5)Glider\n(6)LWSS\nEntre com a opcao: ");
-   scanf("%d",&opcao);
+   printf("(1)Bloco\n(2)Bote\n(3)Blinker\n(4)Sapo\n(5)Glider\n(6)LWSS\n(7)Padrão aleatorio\nEntre com a opcao: ");
+   scanf("%d", &opcao);
    switch(opcao)
    {
      case 1:   inicBloco(mat,nL,nC); break;
@@ -96,6 +103,7 @@ int  menuInicJogo(char mat[ ][MAXC], int nL, int nC)
      case 4:   inicSapo(mat,nL,nC); break;
      case 5:   inicGlider(mat,nL,nC); break;
      case 6:   inicLWSS(mat,nL,nC); break;
+     case 7:   inicAleat(mat,nL,nC); break;
    }
 
     imprimeMatriz(mat,nL,nC);
@@ -143,46 +151,29 @@ int verificarVivos(char matriz[][MAXC] , int i , int j , int linhas , int coluna
     int vivos = 0;
 
     if (j + 1 < colunas && matriz[i][j + 1] == 'X')
-    { 
         vivos++; 
-    }
 
     if (j - 1 >= 0 && matriz[i][j - 1] == 'X')
-    { 
         vivos++; 
-    }
-
+    
     if (i + 1 < linhas && matriz[i + 1][j] == 'X') 
-    {
-       vivos++; 
-    }
+        vivos++; 
 
     if (i - 1 >= 0 && matriz[i - 1][j] == 'X') 
-    {
         vivos++; 
-    }
-
+  
     if (i - 1 >= 0 && j - 1 >= 0 && matriz[i - 1][j - 1] == 'X')
-    { 
         vivos++; 
-    }
-
-    if (i - 1 >= 0 && j + 1 < colunas && matriz[i - 1][j + 1] == 'X') 
-    {
-        vivos++;
-    }
-
-    if (i + 1 < linhas && j - 1 >= 0 && matriz[i + 1][j - 1] == 'X') 
-    {
-        vivos++;
-    }
-
-    if (i + 1 < linhas && j + 1 < colunas && matriz[i + 1][j + 1] == 'X')
-    { 
-        vivos++; 
-    }
-      
     
+    if (i - 1 >= 0 && j + 1 < colunas && matriz[i - 1][j + 1] == 'X') 
+        vivos++;
+  
+    if (i + 1 < linhas && j - 1 >= 0 && matriz[i + 1][j - 1] == 'X') 
+        vivos++;
+    
+    if (i + 1 < linhas && j + 1 < colunas && matriz[i + 1][j + 1] == 'X')
+        vivos++; 
+
   return vivos;
 }
 
@@ -352,4 +343,30 @@ char padrao[4][5]={{M,V,M,M,V},{V,M,M,M,M},{V,M,M,M,V},{V,V,V,V,M}};
     for(j=0;j<5;j++)
       m[xInic+i][yInic+j]=padrao[i][j];
 
+}
+
+void inicAleat(char m[ ][MAXC], int nL, int nC)
+{
+    int i , j , posX , posY , estado;
+    srand(time(NULL));
+
+    posX = nL - 5;  
+    posY = nC - 5;
+
+    for(i = 0 ; i < nL ; i++)
+    {
+      for(j = 0 ; j < nC ; j++)
+      {
+          estado = rand() % 2;
+
+          if(estado == 1)
+            m[posX + i][posY + j] = 'X';
+
+          else
+            m[posX + i][posY + j] = '.';
+          
+      }
+
+    }
+    
 }
