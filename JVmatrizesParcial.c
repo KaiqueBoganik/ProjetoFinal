@@ -35,13 +35,13 @@ void copiaMatriz(char mCopia[][MAXC],char m[][MAXC], int nL, int nC);
 void atualizaTabuleiro(char mAtual[][MAXC], char nAnterior[][MAXC], int nL, int nC);
 void jogaJogoVida(char mAtual[ ][MAXC], int nL, int nC, int nCiclos);
 
-void inicBloco(char m[ ][MAXC], int nL, int nC);
-void inicBote(char m[ ][MAXC], int nL, int nC);
-void inicBlinker(char m[ ][MAXC], int nL, int nC);
-void inicSapo(char m[ ][MAXC], int nL, int nC);
-void inicGlider(char m[ ][MAXC], int nL, int nC);
-void inicLWSS(char m[ ][MAXC], int nL, int nC);
-void inicAleat(char m[ ][MAXC], int nL, int nC);
+void inicBloco(char m[][MAXC], int nL, int nC, int xInic, int yInic);
+void inicBote(char m[][MAXC], int nL, int nC, int xInic, int yInic);
+void inicBlinker(char m[][MAXC], int nL, int nC, int xInic, int yInic);
+void inicSapo(char m[][MAXC], int nL, int nC, int xInic, int yInic);
+void inicGlider(char m[][MAXC], int nL, int nC, int xInic, int yInic);
+void inicLWSS(char m[][MAXC], int nL, int nC, int xInic, int yInic);
+void inicAleat(char m[][MAXC], int nL, int nC, int xInic, int yInic);
 
 //Atencao!!!! Nas etapa 1b de desenvolvimento vc pode  alterar esse prot�tipo, sua respectiva chamada e defini��o
 int menuInicJogo(char m[ ][MAXC], int nL, int nC);
@@ -78,7 +78,10 @@ int main()
         scanf("%d" , &escolha);
 
         if(escolha == 2)
+        {
             continuar = 0;
+            printf("Encerrado\n");
+        }
 
     }
 
@@ -89,21 +92,27 @@ int main()
 
 int  menuInicJogo(char mat[ ][MAXC], int nL, int nC)
 {
-    int opcao;
+    int opcao , xInic , yInic;
 
    limpaMatriz(mat,nL,nC);
 
    printf("(1)Bloco\n(2)Bote\n(3)Blinker\n(4)Sapo\n(5)Glider\n(6)LWSS\n(7)Padrão aleatorio\nEntre com a opcao: ");
    scanf("%d", &opcao);
+
+   printf("Digite a linha inicial:\n");
+   scanf("%d" , &xInic);
+   printf("Digite a coluna inicia:\n");
+   scanf("%d", &yInic);
+
    switch(opcao)
    {
-     case 1:   inicBloco(mat,nL,nC); break;
-     case 2:   inicBote(mat,nL,nC); break;
-     case 3:   inicBlinker(mat,nL,nC); break;
-     case 4:   inicSapo(mat,nL,nC); break;
-     case 5:   inicGlider(mat,nL,nC); break;
-     case 6:   inicLWSS(mat,nL,nC); break;
-     case 7:   inicAleat(mat,nL,nC); break;
+    case 1: inicBloco(mat, nL, nC, xInic, yInic); break;
+    case 2: inicBote(mat, nL, nC, xInic, yInic); break;
+    case 3: inicBlinker(mat, nL, nC, xInic, yInic); break;
+    case 4: inicSapo(mat, nL, nC, xInic, yInic); break;
+    case 5: inicGlider(mat, nL, nC, xInic, yInic); break;
+    case 6: inicLWSS(mat, nL, nC, xInic, yInic); break;
+    case 7: inicAleat(mat, nL, nC, xInic, yInic); break;
    }
 
     imprimeMatriz(mat,nL,nC);
@@ -258,113 +267,122 @@ void limpaMatriz(char m[ ][MAXC], int nL, int nC)
 }
 
 ////////////////////////////////////////////////
-void inicBloco(char m[ ][MAXC], int nL, int nC)
+void inicBloco(char m[][MAXC], int nL, int nC, int xInic, int yInic)
 {
- char padrao[2][2]={{V,V},{V,V}};
-  int i,j,xInic=nL/2, yInic=nC/2;
+  char padrao[2][2] = {{V, V}, {V, V}};
+  int i , j;
 
-
- //posiciona o padr�o no tabuleiro
- for(i=0;i<2;i++)
-    for(j=0;j<2;j++)
-      m[xInic+i][yInic+j]=padrao[i][j];
+    for (i = 0; i < 2; i++)
+    {
+      for (j = 0; j < 2; j++)
+      {
+          if (xInic + i < nL && yInic + j < nC)
+              m[xInic + i][yInic + j] = padrao[i][j];
+      }
+    }
 }
 
 ////////////////////////////////////////////////
-void inicBote(char m[ ][MAXC], int nL, int nC)
+void inicBote(char m[][MAXC], int nL, int nC, int xInic, int yInic)
 {
- char padrao[3][3]={{V,V,M},{V,M,V},{M,V,M}};
-  int i,j,xInic=nL/2, yInic=nC/2;
+  char padrao[3][3]={{V,V,M},{V,M,V},{M,V,M}};
+  int i,j;
 
-
- //posiciona o padr�o no tabuleiro
- for(i=0;i<3;i++)
-    for(j=0;j<3;j++)
-      m[xInic+i][yInic+j]=padrao[i][j];
+  for(i = 0; i < 3; i++)
+  {
+    for(j = 0 ; j < 3; j++)
+    {
+      if (xInic + i < nL && yInic + j < nC)
+          m[xInic+i][yInic+j]=padrao[i][j];
+    }
+  }
 }
 ////////////////////////////////////////////////
-void inicBlinker(char m[ ][MAXC], int nL, int nC)
+void inicBlinker(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
 {
   char padrao[1][3]={{V,V,V}};
-  int i,j, xInic=nL/2, yInic=nC/2;
+  int i , j;
 
-
- //posiciona o padr�o no tabuleiro
- for(i=0;i<1;i++)
-    for(j=0;j<3;j++)
-      m[xInic+i][yInic+j]=padrao[i][j];
+  for(i = 0; i < 1; i++)
+  {
+    for(j = 0 ; j < 3; j++)
+    {
+      if (xInic + i < nL && yInic + j < nC)
+          m[xInic+i][yInic+j]=padrao[i][j];
+    }
+  }
 }
 
 
 ////////////////////////////////////////////////
-void inicSapo(char m[ ][MAXC], int nL, int nC)
+void inicSapo(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
 {
 
  char padrao[2][4]={{M,V,V,V},{V,V,V,M}};
-  int i,j,xInic=nL/2, yInic=nC/2;
+  int i,j;
 
-
-  //posiciona o padr�o no tabuleiro
-   for(i=0;i<2;i++)
-      for(j=0;j<4;j++)
-      m[xInic+i][yInic+j]=padrao[i][j];
+  for(i = 0; i < 2; i++)
+  {
+    for(j = 0 ; j < 4; j++)
+    {
+      if (xInic + i < nL && yInic + j < nC)
+          m[xInic+i][yInic+j]=padrao[i][j];
+    }
+  }
 
 }
 
 ////////////////////////////////////////////////
-void inicGlider(char m[ ][MAXC], int nL, int nC)
+void inicGlider(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
 {
 char padrao[3][3]={{V,V,V},{V,M,M},{M,V,M}};
- int i,j,xInic,yInic;
+ int i,j;
 
-
- xInic=nL-4;
- yInic=nC-4;
-
- //posiciona o padr�o no tabuleiro
- for(i=0;i<3;i++)
-    for(j=0;j<3;j++)
-      m[xInic+i][yInic+j]=padrao[i][j];
+ for(i = 0; i < 3; i++)
+ {
+   for(j = 0 ; j < 3; j++)
+   {
+     if (xInic + i < nL && yInic + j < nC)
+         m[xInic+i][yInic+j]=padrao[i][j];
+   }
+ }
 }
 
 ////////////////////////////////////////////////
-void inicLWSS(char m[ ][MAXC], int nL, int nC)
+void inicLWSS(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
 {
-char padrao[4][5]={{M,V,M,M,V},{V,M,M,M,M},{V,M,M,M,V},{V,V,V,V,M}};
- int i,j,xInic,yInic;
+  char padrao[4][5]={{M,V,M,M,V},{V,M,M,M,M},{V,M,M,M,V},{V,V,V,V,M}};
+  int i,j;
 
-
-
- xInic=nL-5;
- yInic=nC-6;
-
- //posiciona o padr�o no tabuleiro
- for(i=0;i<4;i++)
-    for(j=0;j<5;j++)
-      m[xInic+i][yInic+j]=padrao[i][j];
-
+  for(i = 0; i < 3; i++)
+  {
+    for(j = 0 ; j < 3; j++)
+    {
+      if (xInic + i < nL && yInic + j < nC)
+          m[xInic+i][yInic+j]=padrao[i][j];
+    }
+  }
 }
 
-void inicAleat(char m[ ][MAXC], int nL, int nC)
+void inicAleat(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
 {
-    int i , j , posX , posY , estado;
+    int i , j , estado;
     srand(time(NULL));
 
-    posX = nL - 5;  
-    posY = nC - 5;
-
-    for(i = 0 ; i < nL ; i++)
+    for(i = 0 ; i < 5 ; i++)
     {
-      for(j = 0 ; j < nC ; j++)
+      for(j = 0 ; j < 5 ; j++)
       {
+        if (xInic + i < nL && yInic + j < nC)
+        {
           estado = rand() % 2;
 
           if(estado == 1)
-            m[posX + i][posY + j] = 'X';
+            m[xInic + i][yInic + j] = 'X';
 
           else
-            m[posX + i][posY + j] = '.';
-          
+            m[xInic + i][yInic + j] = '.';
+        }
       }
 
     }
