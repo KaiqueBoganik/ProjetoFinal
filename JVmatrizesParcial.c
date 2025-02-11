@@ -45,7 +45,6 @@ void inicAleat(char m[][MAXC], int nL, int nC, int xInic, int yInic);
 
 //Atencao!!!! Nas etapa 1b de desenvolvimento vc pode  alterar esse prot�tipo, sua respectiva chamada e defini��o
 int menuInicJogo(char m[ ][MAXC],int nL, int nC);
-void definicoes(char m[][MAXC]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -62,9 +61,9 @@ int main()
 
    int nL,nC,nCiclos; //ou fornecidos pelo usuario
    int op; //opcao fornecida pelo usuario e retornada pela funcao menuInicJogo
-   int continuar = 1 , escolha , opcaoInicio , opcaoTab;
+   int continuar = 1 , escolha , opcaoInicio , opcaoTab , opcaoCiclos;
 
-   printf("Deseja inciar a simulação?\n Digite:\n (1)Sim \n (2)Não\n");
+   printf("Deseja inciar a simulação?\n Digite:\n(1)Sim(2)Não\n");
    scanf("%d" , &opcaoInicio);
 
    if(opcaoInicio == 1)
@@ -76,7 +75,7 @@ int main()
 
       while(nCiclos == 0)
       {
-        printf("Digite um valor de ciclos váido\n");
+        printf("Digite um valor de ciclos válido\n");
         scanf("%d" , &nCiclos);
       }
 
@@ -87,7 +86,7 @@ int main()
         DORME(TEMPO);
         jogaJogoVida(tab,nL,nC,nCiclos); //Etapa 1a: complete essa funcao no trecho de sua defini��o
 
-        printf("Deseja continuar jogando?\n (1)Sim \n (2)Não\n");
+        printf("Deseja continuar jogando?\n(1)Sim(2)Não\n");
         scanf("%d" , &escolha);
 
         if(escolha == 2)
@@ -96,19 +95,43 @@ int main()
             printf("Encerrado\n");
         }
 
-        printf("Deseja alterar o tamanho do tabuleiro?(1)Sim (2)Não\n");
-        scanf("%d" , &opcaoTab);
-
-        if(opcaoTab < 1 || opcaoTab > 2)
+        if(escolha == 1)
         {
-          printf("Opcao Inválida. Digite novamente:\n");
+          printf("Deseja alterar o tamanho do tabuleiro?\n(1)Sim(2)Não\n");
           scanf("%d" , &opcaoTab);
-        }
 
-        else if(opcaoTab == 1)
-        {
-          printf("Digite o tamanho do tabuleiro:\n");
-          scanf("%d %d" , &nL , &nC);
+          while(opcaoTab < 1 || opcaoTab > 2)
+          {
+            printf("Opcao Inválida. Digite novamente:\n");
+            scanf("%d" , &opcaoTab);
+          }
+
+          if(opcaoTab == 1)
+          {
+            printf("Digite o tamanho do tabuleiro:\n");
+            scanf("%d %d" , &nL , &nC);
+          }
+
+          printf("Deseja mudar a quantidade de ciclos?\n(1)Sim(2)Não\n");
+          scanf("%d" , &opcaoCiclos);
+
+          while(opcaoTab < 1 || opcaoTab > 2)
+          {
+            printf("Digite uma opção válida.\n");
+            scanf("%d" , &opcaoCiclos);
+          }
+
+          if(opcaoCiclos == 1)
+          {
+            printf("Digite quantas vezes deseja ver:\n");
+            scanf("%d" , &nCiclos);
+
+            while(nCiclos == 0)
+            {
+              printf("Digite um valor de ciclos válido\n");
+              scanf("%d" , &nCiclos);
+            }
+          }
         }
       }
    }
@@ -119,27 +142,41 @@ int main()
   return 0;
 }
 
+
 int menuInicJogo(char mat[ ][MAXC], int nL, int nC)
 {
     int opcao , xInic , yInic;
 
    limpaMatriz(mat,nL,nC);
 
+   printf("Qual padrão deseja executar?\n");
    printf("(1)Bloco\n(2)Bote\n(3)Blinker\n(4)Sapo\n(5)Glider\n(6)LWSS\n(7)Padrão aleatorio\nEntre com a opcao: ");
    scanf("%d", &opcao);
 
+   while(opcao < 1 || opcao > 7)
+   {
+      printf("Opção inválida. Digite novamenete\n");
+      scanf("%d" , &opcao);
+   }
+
    printf("Digite a linha inicial:\n");
    scanf("%d" , &xInic);
+
+   while(xInic < 0 || xInic >= nL)
+   {
+      printf("Posição inválida. Digite novamente.\n");
+      printf("Digite a linha inicial novamente\n");
+      scanf("%d", &xInic);
+   }
+
    printf("Digite a coluna inicia:\n");
    scanf("%d", &yInic);
 
-   while (xInic < 0 || xInic >= nL || yInic < 0 || yInic >= nC) 
+   while(yInic < 0 || yInic >= nC) 
    {
-    printf("Posição inválida. Digite novamente.\n");
-    printf("Digite a linha inicial novamente\n");
-    scanf("%d", &xInic);
-    printf("Digite a coluna inicial novamente\n");
-    scanf("%d", &yInic);
+      printf("Posição inválida. Digite novamente.\n");
+      printf("Digite a coluna inicial novamente\n");
+      scanf("%d", &yInic);
    }
 
     switch(opcao)
@@ -152,6 +189,7 @@ int menuInicJogo(char mat[ ][MAXC], int nL, int nC)
       case 6: inicLWSS(mat, nL, nC, xInic, yInic); break;
       case 7: inicAleat(mat, nL, nC, xInic, yInic); break;
     }
+
 
     imprimeMatriz(mat,nL,nC);
     printf("Se a inicializacao estiver correta digite qualquer tecla para iniciar o jogo...");
@@ -363,11 +401,12 @@ void inicSapo(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
     for(j = 0 ; j < 4; j++)
     {
       if (xInic + i < nL && yInic + j < nC)
-          m[xInic+i][yInic+j]=padrao[i][j];
+        m[xInic+i][yInic+j]=padrao[i][j];
     }
   }
-
 }
+
+
 
 ////////////////////////////////////////////////
 void inicGlider(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
