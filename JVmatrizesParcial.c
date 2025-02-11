@@ -378,14 +378,19 @@ void inicBlinker(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
   char padrao[1][3]={{V,V,V}};
   int i , j;
 
-  for(i = 0; i < 1; i++)
-  {
-    for(j = 0 ; j < 3; j++)
+  if(xInic + 3 < nL && yInic + 1 < nC)
+  { 
+    for(i = 0; i < 1; i++)
     {
-      if (xInic + i < nL && yInic + j < nC)
-          m[xInic+i][yInic+j]=padrao[i][j];
+      for(j = 0 ; j < 3; j++)
+      {
+        if(xInic + i < nL && yInic + j < nC)
+            m[xInic + i][yInic + j] = padrao[i][j];
+      }
     }
   }
+  else
+    printf("Não foi possível gerar\n");
 }
 
 
