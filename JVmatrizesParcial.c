@@ -45,6 +45,7 @@ void inicAleat(char m[][MAXC], int nL, int nC, int xInic, int yInic);
 
 //Atencao!!!! Nas etapa 1b de desenvolvimento vc pode  alterar esse prot�tipo, sua respectiva chamada e defini��o
 int menuInicJogo(char m[ ][MAXC],int nL, int nC);
+void definicoes(char m[][MAXC]);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
