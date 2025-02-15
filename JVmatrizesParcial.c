@@ -191,16 +191,16 @@ int main()
 void alocaMatriz(Tab *tabuleiro)
 {
   int i;
-  tabuleiro->m = (char**)malloc(tabuleiro->dim2 * sizeof(char*));
+  tabuleiro->m = (char**)malloc(tabuleiro->dim1 * sizeof(char*));
   if(tabuleiro->m == NULL)
   {
     printf("Não foi possível alocar\n");
     exit(1);
   }
 
-  for(i = 0 ; i < tabuleiro->dim2 ; i++)
+  for(i = 0 ; i < tabuleiro->dim1 ; i++)
   {
-    tabuleiro->m[i] = (char*)malloc(tabuleiro->dim1 * sizeof(char));
+    tabuleiro->m[i] = (char*)malloc(tabuleiro->dim2 * sizeof(char));
     if(tabuleiro->m[i] == NULL)
     {
       printf("Não foi possível alocar\n");
@@ -214,7 +214,7 @@ void freeMatriz(Tab *matriz)
 {
   int i;
 
-  for(i = 0 ; i < matriz->dim2 ; i++)
+  for(i = 0 ; i < matriz->dim1 ; i++)
   {
     free(matriz->m[i]);
   }
