@@ -1,12 +1,13 @@
-#include <stdio.h>
+#include<stdio.h>
 #include<stdlib.h>
-
+#include<time.h>
 
 //windows-msvc-x64
 #define V 'X'
 #define M '.'
 #define MAXL 100
 #define MAXC 100
+#define TAM 50
 
 
 // o trecho abaixo define algumas macros
@@ -22,29 +23,39 @@
     #define TEMPO 100
 #endif
 
+typedef struct tab
+{
+  char nomeJogo[TAM]; 
+  
+  int ciclosVida; 
+  int dim1,dim2; 
+  char **m; 
+  
+}Tab;
+
 //////////////////////////////////////////////////////////////////////////////////////////////
 /////////////////////////////////Inicio dos prototipos ///////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-
-
 //Atencao!!!! Nas etapa 1a de desenvolvimento voce nao deve mudar nenhum dos prototipos abaixo...
-void limpaMatriz(char m[ ][MAXC], int nL, int nC);
-void imprimeMatriz(char m[][MAXC],int nL, int nC);
-void copiaMatriz(char mCopia[][MAXC],char m[][MAXC], int nL, int nC);
-void atualizaTabuleiro(char mAtual[][MAXC], char nAnterior[][MAXC], int nL, int nC);
-void jogaJogoVida(char mAtual[ ][MAXC], int nL, int nC, int nCiclos);
+void limpaMatriz(Tab *tabuleiro);
+void imprimeMatriz(Tab *tabuleiro);
+void copiaMatriz(Tab *mAtual , Tab *mNova);
+void atualizaTabuleiro(Tab *mAtual , Tab *mAnterior);
+void jogaJogoVida(Tab *tabuleiro);
 
-void inicBloco(char m[][MAXC], int nL, int nC, int xInic, int yInic);
-void inicBote(char m[][MAXC], int nL, int nC, int xInic, int yInic);
-void inicBlinker(char m[][MAXC], int nL, int nC, int xInic, int yInic);
-void inicSapo(char m[][MAXC], int nL, int nC, int xInic, int yInic);
-void inicGlider(char m[][MAXC], int nL, int nC, int xInic, int yInic);
-void inicLWSS(char m[][MAXC], int nL, int nC, int xInic, int yInic);
-void inicAleat(char m[][MAXC], int nL, int nC, int xInic, int yInic);
+void inicBloco(Tab *tabuleiro, int xInic, int yInic);
+void inicBote(Tab *tabuleiro, int xInic, int yInic);
+void inicBlinker(Tab *tabuleiro, int xInic, int yInic);
+void inicSapo(Tab *tabuleiro, int xInic, int yInic);
+void inicGlider(Tab *tabuleiro, int xInic, int yInic);
+void inicLWSS(Tab *tabuleiro, int xInic, int yInic);
+void inicAleat(Tab *tabuleiro, int xInic, int yInic);
 
 //Atencao!!!! Nas etapa 1b de desenvolvimento vc pode  alterar esse prot�tipo, sua respectiva chamada e defini��o
-int menuInicJogo(char m[ ][MAXC], int nL, int nC);
+int menuInicJogo(Tab *tabuleiro);
+void alocaMatriz(Tab *tabuleiro);
+void freeMatriz(Tab *tabuleiro);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -54,27 +65,55 @@ int menuInicJogo(char m[ ][MAXC], int nL, int nC);
 
 //////////////////////////////////////////////// In�cio da parte a ser alterada na etapa 1b   ///////////////////////////////////
 
-int main()
+int main() 
 {
 
-   char tab[MAXL][MAXC];
+   Tab tabuleiro;
+   int continuar = 1 , escolha , opcaoInicio , opcaoTab , opcaoCiclos , op;
 
-   int nL,nC,nCiclos; //ou fornecidos pelo usuario
-   int op; //opcao fornecida pelo usuario e retornada pela funcao menuInicJogo
-   int continuar = 1 , escolha;
+   printf("Deseja inciar a simulação?\n Digite:\n(1)Sim(2)Não\n");
+   scanf("%d" , &opcaoInicio);
 
-   printf("Digite o tamanho do tabuleiro:\n");
-   scanf("%d %d" , &nL , &nC);
-   printf("Digite quantas vezes deseja ver:\n");
-   scanf("%d" , &nCiclos);
+   if(opcaoInicio == 1)
+   {
+      printf("Digite o tamanho horizontal do tabuleiro:\n");
+      scanf("%d" , &tabuleiro.dim1);
 
-    while(continuar)
-    {
-        op = menuInicJogo(tab,nL,nC);
+      while(tabuleiro.dim1 <= 1)
+      {
+        printf("Digite um tamanho válido\n");
+        scanf("%d" , &tabuleiro.dim1);
+      }
+
+      printf("Digite o tamanho vertical do tabuleiro:\n");
+      scanf("%d" , &tabuleiro.dim2);
+
+      while(tabuleiro.dim2 <= 1)
+      {
+        printf("Digite um tamanho válido\n");
+        scanf("%d" , &tabuleiro.dim2);
+      }
+
+      alocaMatriz(&tabuleiro);
+
+      printf("Digite quantas vezes deseja ver:\n");
+      scanf("%d" , &tabuleiro.ciclosVida);
+
+      while(tabuleiro.ciclosVida <= 0)
+      {
+        printf("Digite um valor de ciclos válido\n");
+        scanf("%d" , &tabuleiro.ciclosVida);
+      }
+
+
+      while(continuar)
+      {
+        op = menuInicJogo(&tabuleiro);
         printf("iniciando jogo com opcao %d\n\n", op);
         DORME(TEMPO);
-        jogaJogoVida(tab,nL,nC,nCiclos); //Etapa 1a: complete essa funcao no trecho de sua defini��o
-        printf("Deseja continuar jogando?\n (1)Sim \n (2)Não\n");
+        jogaJogoVida(&tabuleiro); 
+
+        printf("Deseja continuar jogando?\n(1)Sim(2)Não\n");
         scanf("%d" , &escolha);
 
         if(escolha == 2)
@@ -83,129 +122,243 @@ int main()
             printf("Encerrado\n");
         }
 
-    }
+        if(escolha == 1)
+        {
+          printf("Deseja alterar o tamanho do tabuleiro?\n(1)Sim(2)Não\n");
+          scanf("%d" , &opcaoTab);
 
-  //fim do laco indeterminado
+          while(opcaoTab < 1 || opcaoTab > 2)
+          {
+            printf("Opcao Inválida. Digite novamente:\n");
+            scanf("%d" , &opcaoTab);
+          }
 
-   return 0;
+          if(opcaoTab == 1)
+          {
+            printf("Digite o tamanho horizontal do tabuleiro:\n");
+            scanf("%d" , &tabuleiro.dim1);
+            while(tabuleiro.dim1 <= 1)
+            {
+              printf("Digite um tamanho válido\n");
+              scanf("%d" , &tabuleiro.dim1);
+            }
+
+            printf("Digite o tamanho vertical do tabuleiro:\n");
+            scanf("%d" , &tabuleiro.dim2);
+            while(tabuleiro.dim2 <= 1)
+            {
+              printf("Digite um tamanho válido\n");
+              scanf("%d" , &tabuleiro.dim2);
+            }
+
+          }
+        }
+
+          printf("Deseja mudar a quantidade de ciclos?\n(1)Sim(2)Não\n");
+          scanf("%d" , &opcaoCiclos);
+
+          while(opcaoCiclos < 1 || opcaoCiclos > 2)
+          {
+            printf("Digite uma opção válida.\n");
+            scanf("%d" , &opcaoCiclos);
+          }
+
+          if(opcaoCiclos == 1)
+          {
+            printf("Digite quantas vezes deseja ver:\n");
+            scanf("%d" , &tabuleiro.ciclosVida);
+
+            while(tabuleiro.ciclosVida == 0)
+            {
+              printf("Digite um valor de ciclos válido\n");
+              scanf("%d" , &tabuleiro.ciclosVida);
+            }
+          }
+        }
+      }
+   
+
+   else
+    printf("Encerrando programa\n");
+
+  if(tabuleiro.m != NULL)
+    freeMatriz(&tabuleiro);
+
+  return 0;
 }
 
-int  menuInicJogo(char mat[ ][MAXC], int nL, int nC)
+void alocaMatriz(Tab *tabuleiro)
 {
-    int opcao , xInic , yInic;
+  int i;
+  tabuleiro->m = (char**)malloc(tabuleiro->dim2 * sizeof(char*));
+  if(tabuleiro->m == NULL)
+  {
+    printf("Não foi possível alocar\n");
+    exit(1);
+  }
 
-   limpaMatriz(mat,nL,nC);
+  for(i = 0 ; i < tabuleiro->dim2 ; i++)
+  {
+    tabuleiro->m[i] = (char*)malloc(tabuleiro->dim1 * sizeof(char));
+    if(tabuleiro->m[i] == NULL)
+    {
+      printf("Não foi possível alocar\n");
+      exit(1);
+    }
+  }
 
+}
+
+void freeMatriz(Tab *matriz)
+{
+  int i;
+
+  for(i = 0 ; i < matriz->dim2 ; i++)
+  {
+    free(matriz->m[i]);
+  }
+
+  free(matriz->m);
+}
+
+
+int menuInicJogo(Tab *tabuleiro)
+{
+   int opcao , xInic , yInic;
+
+   limpaMatriz(tabuleiro);
+
+   printf("Qual padrão deseja executar?\n");
    printf("(1)Bloco\n(2)Bote\n(3)Blinker\n(4)Sapo\n(5)Glider\n(6)LWSS\n(7)Padrão aleatorio\nEntre com a opcao: ");
    scanf("%d", &opcao);
 
+   while(opcao < 1 || opcao > 7)
+   {
+      printf("Opção inválida. Digite novamenete\n");
+      scanf("%d" , &opcao);
+   }
+
    printf("Digite a linha inicial:\n");
    scanf("%d" , &xInic);
+
+   while(xInic < 0 || xInic >= tabuleiro->dim1)
+   {
+      printf("Posição inválida. Digite novamente.\n");
+      printf("Digite a linha inicial novamente\n");
+      scanf("%d", &xInic);
+   }
+
    printf("Digite a coluna inicia:\n");
    scanf("%d", &yInic);
 
-   switch(opcao)
+   while(yInic < 0 || yInic >= tabuleiro->dim2) 
    {
-    case 1: inicBloco(mat, nL, nC, xInic, yInic); break;
-    case 2: inicBote(mat, nL, nC, xInic, yInic); break;
-    case 3: inicBlinker(mat, nL, nC, xInic, yInic); break;
-    case 4: inicSapo(mat, nL, nC, xInic, yInic); break;
-    case 5: inicGlider(mat, nL, nC, xInic, yInic); break;
-    case 6: inicLWSS(mat, nL, nC, xInic, yInic); break;
-    case 7: inicAleat(mat, nL, nC, xInic, yInic); break;
+      printf("Posição inválida. Digite novamente.\n");
+      printf("Digite a coluna inicial novamente\n");
+      scanf("%d", &yInic);
    }
 
-    imprimeMatriz(mat,nL,nC);
-    printf("Se inicializacao correta digite qualquer tecla para iniciar o jogo...");
-    while(getchar()!='\n'); //limpa a mem�ria do teclado (caso tenha sobrado ENTER (\n)
+    switch(opcao)
+    {
+      case 1: inicBloco(tabuleiro,xInic, yInic); break;
+      case 2: inicBote(tabuleiro,xInic, yInic); break;
+      case 3: inicBlinker(tabuleiro,xInic, yInic); break;
+      case 4: inicSapo(tabuleiro,xInic, yInic); break;
+      case 5: inicGlider(tabuleiro,xInic, yInic); break;
+      case 6: inicLWSS(tabuleiro,xInic, yInic); break;
+      case 7: inicAleat(tabuleiro,xInic, yInic); break;
+    }
+
+
+    imprimeMatriz(tabuleiro);
+    printf("Se a inicializacao estiver correta digite qualquer tecla para iniciar o jogo...");
+    while(getchar()!='\n'); 
     getchar();
 
     return opcao;
 
-}
-
+} 
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////// Inicio da Parte a ser completada na Etapa 1 /////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
 
-void imprimeMatriz(char m[][MAXC],int nL, int nC)
+void imprimeMatriz(Tab *matriz)
 {
     int i , j;
-    for(i = 0 ; i < nL ; i++)
+    for(i = 0 ; i < matriz->dim1 ; i++)
     {
-        for(j = 0 ; j < nC ; j++)
+        for(j = 0 ; j < matriz->dim2 ; j++)
         {
-            printf("%c " , m[i][j]);
+            printf("%c " , matriz->m[i][j]);
         }
       printf("\n");
     }
 }
 
-void copiaMatriz(char mCopia[][MAXC],char m[][MAXC], int nL, int nC)
+void copiaMatriz(Tab *mAterior , Tab *mAtual)
 {
-
     int i , j;
-    for(i = 0 ; i < nL ; i++)
+    for(i = 0 ; i < mAterior->dim1 ; i++)
     {
-        for(j = 0 ; j < nC ; j++)
+        for(j = 0 ; j < mAterior->dim2 ; j++)
         {
-           mCopia[i][j] = m[i][j];
+          mAtual->m[i][j] = mAterior->m[i][j];
         }
     }
 }
 
-int verificarVivos(char matriz[][MAXC] , int i , int j , int linhas , int colunas)
+int verificarVivos(Tab *matriz , int i , int j)
 {
     int vivos = 0;
 
-    if (j + 1 < colunas && matriz[i][j + 1] == 'X')
+    if (j + 1 < matriz->dim2 && matriz->m[i][j + 1] == 'X')
         vivos++; 
 
-    if (j - 1 >= 0 && matriz[i][j - 1] == 'X')
+    if (j - 1 >= 0 && matriz->m[i][j - 1] == 'X')
         vivos++; 
     
-    if (i + 1 < linhas && matriz[i + 1][j] == 'X') 
+    if (i + 1 < matriz->dim1 && matriz->m[i + 1][j] == 'X') 
         vivos++; 
 
-    if (i - 1 >= 0 && matriz[i - 1][j] == 'X') 
+    if (i - 1 >= 0 && matriz->m[i - 1][j] == 'X') 
         vivos++; 
   
-    if (i - 1 >= 0 && j - 1 >= 0 && matriz[i - 1][j - 1] == 'X')
+    if (i - 1 >= 0 && j - 1 >= 0 && matriz->m[i - 1][j - 1] == 'X')
         vivos++; 
     
-    if (i - 1 >= 0 && j + 1 < colunas && matriz[i - 1][j + 1] == 'X') 
+    if (i - 1 >= 0 && j + 1 < matriz->dim2 && matriz->m[i - 1][j + 1] == 'X') 
         vivos++;
   
-    if (i + 1 < linhas && j - 1 >= 0 && matriz[i + 1][j - 1] == 'X') 
+    if (i + 1 < matriz->dim1 && j - 1 >= 0 && matriz->m[i + 1][j - 1] == 'X') 
         vivos++;
     
-    if (i + 1 < linhas && j + 1 < colunas && matriz[i + 1][j + 1] == 'X')
+    if (i + 1 < matriz->dim1 && j + 1 < matriz->dim2 && matriz->m[i + 1][j + 1] == 'X')
         vivos++; 
 
   return vivos;
 }
 
-void atualizaMat(char mAtual[][MAXC], char mAnterior[][MAXC], int nL, int nC)
+void atualizaTabuleiro(Tab *mAtual , Tab *mAnterior)
 {
   int i , j , vivos;
 
-  for(i = 0 ; i < nL ; i++)
+  for(i = 0 ; i < mAnterior->dim1 ; i++)
   {
-    for(j = 0 ; j < nC ; j++)
+    for(j = 0 ; j < mAnterior->dim2 ; j++)
     {
-      vivos = verificarVivos(mAnterior, i, j, nL, nC);
+      vivos = verificarVivos(mAnterior, i, j);
 
-      if (mAnterior[i][j] == 'X')
+      if (mAnterior->m[i][j] == 'X')
       {
         if (vivos < 2 || vivos > 3)
         {
-          mAtual[i][j] = '.';
+          mAtual->m[i][j] = '.';
         }
               
         else
         {
-          mAtual[i][j] = 'X'; 
+          mAtual->m[i][j] = 'X'; 
         }
       }
         
@@ -213,11 +366,11 @@ void atualizaMat(char mAtual[][MAXC], char mAnterior[][MAXC], int nL, int nC)
       {
         if (vivos == 3)
         {
-          mAtual[i][j] = 'X';
+          mAtual->m[i][j] = 'X';
         }
         else
         {
-          mAtual[i][j] = '.';
+          mAtual->m[i][j] = '.';
         }
       }
     }
@@ -230,44 +383,51 @@ void atualizaMat(char mAtual[][MAXC], char mAnterior[][MAXC], int nL, int nC)
 //////////////////////////////////////////////////////////////////////////////////////////////
 
 
-void jogaJogoVida(char mAtual[ ][MAXC], int nL, int nC, int nCiclos)
+void jogaJogoVida(Tab *tabuleiro)
 {
-  char nAnterior[MAXL][MAXC];
+  Tab mAnterior;
   int c;
 
-  //imprimindo na tela a matriz inicial
+  mAnterior.dim1 = tabuleiro->dim1;
+  mAnterior.dim2 = tabuleiro->dim2;
+
+  alocaMatriz(&mAnterior);
+
   system(LIMPATELA);
-  imprimeMatriz(mAtual,nL,nC); //TO DO
-  DORME(TEMPO);  // use getchar(); caso queira segurar a impressao ate que o
-  //fim da impressao da matriz inicial
+  imprimeMatriz(&mAnterior); 
+  DORME(TEMPO); 
 
-  //iniciando os ciclos do jogo escolhido
-  for(c=1;c<=nCiclos;c++)
+  for(c=1;c <= tabuleiro->ciclosVida;c++)
   {
-        copiaMatriz(nAnterior,mAtual,nL,nC); // implemente a funcao que copia uma matriz na outra, equivalendo a nAnterior = mAtual;
+        copiaMatriz(&mAnterior, tabuleiro);
 
-        atualizaMat(mAtual,nAnterior,nL,nC); //implemente nesta funcao as regras que contam as celulas vizinhas em nAnterior
-                                       //e atualizam a matriz mAtual conforme as regras do jogo da vida
-                                     //lembre de usar os dados de nAnterior como a matriz do jogo no ciclo anterior para atualizar mAtual
+        atualizaTabuleiro(tabuleiro , &mAnterior); 
+                                      
         system(LIMPATELA);
-        imprimeMatriz(mAtual,nL,nC);// implemente a funcao para imprimir a matriz na tela
+        imprimeMatriz(tabuleiro);
         // getchar();
         DORME(TEMPO);
   }
 
+  freeMatriz(&mAnterior);
+
 }
 
 ////////////////////////////////////////////////
-void limpaMatriz(char m[ ][MAXC], int nL, int nC)
+void limpaMatriz(Tab *tabuleiro)
 {
     int i,j;
-    for(i=0;i<nL;i++)
-     for(j=0;j<nC;j++)
-        m[i][j]=M;  // cada c�lula eh preenchida como morta M ('.')
+    for(i = 0 ; i < tabuleiro->dim1 ; i++)
+    {
+      for(j = 0 ; j < tabuleiro->dim2 ; j++)
+      {
+        tabuleiro->m[i][j] = M;
+      }
+    }
 }
 
 ////////////////////////////////////////////////
-void inicBloco(char m[][MAXC], int nL, int nC, int xInic, int yInic)
+void inicBloco(Tab *tabuleiro, int xInic, int yInic)
 {
   char padrao[2][2] = {{V, V}, {V, V}};
   int i , j;
@@ -276,14 +436,14 @@ void inicBloco(char m[][MAXC], int nL, int nC, int xInic, int yInic)
     {
       for (j = 0; j < 2; j++)
       {
-          if (xInic + i < nL && yInic + j < nC)
-              m[xInic + i][yInic + j] = padrao[i][j];
+          if(xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
+            tabuleiro->m[xInic + i][yInic + j] = padrao[i][j];
       }
     }
 }
 
 ////////////////////////////////////////////////
-void inicBote(char m[][MAXC], int nL, int nC, int xInic, int yInic)
+void inicBote(Tab *tabuleiro, int xInic, int yInic)
 {
   char padrao[3][3]={{V,V,M},{V,M,V},{M,V,M}};
   int i,j;
@@ -292,30 +452,35 @@ void inicBote(char m[][MAXC], int nL, int nC, int xInic, int yInic)
   {
     for(j = 0 ; j < 3; j++)
     {
-      if (xInic + i < nL && yInic + j < nC)
-          m[xInic+i][yInic+j]=padrao[i][j];
+      if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
+         tabuleiro->m[xInic+i][yInic+j]=padrao[i][j];
     }
   }
 }
 ////////////////////////////////////////////////
-void inicBlinker(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
+void inicBlinker(Tab *tabuleiro, int xInic, int yInic)
 {
   char padrao[1][3]={{V,V,V}};
   int i , j;
 
-  for(i = 0; i < 1; i++)
-  {
-    for(j = 0 ; j < 3; j++)
+  if(xInic + 3 < tabuleiro->dim1 && yInic + 1 < tabuleiro->dim2)
+  { 
+    for(i = 0; i < 1; i++)
     {
-      if (xInic + i < nL && yInic + j < nC)
-          m[xInic+i][yInic+j]=padrao[i][j];
+      for(j = 0 ; j < 3; j++)
+      {
+        if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
+          tabuleiro->m[xInic+i][yInic+j]=padrao[i][j];
+      }
     }
   }
+  else
+    printf("Não foi possível gerar\n");
 }
 
 
 ////////////////////////////////////////////////
-void inicSapo(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
+void inicSapo(Tab *tabuleiro, int xInic, int yInic)
 {
 
  char padrao[2][4]={{M,V,V,V},{V,V,V,M}};
@@ -325,15 +490,16 @@ void inicSapo(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
   {
     for(j = 0 ; j < 4; j++)
     {
-      if (xInic + i < nL && yInic + j < nC)
-          m[xInic+i][yInic+j]=padrao[i][j];
+      if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
+         tabuleiro->m[xInic+i][yInic+j]=padrao[i][j];
     }
   }
-
 }
 
+
+
 ////////////////////////////////////////////////
-void inicGlider(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
+void inicGlider(Tab *tabuleiro, int xInic, int yInic)
 {
 char padrao[3][3]={{V,V,V},{V,M,M},{M,V,M}};
  int i,j;
@@ -342,14 +508,14 @@ char padrao[3][3]={{V,V,V},{V,M,M},{M,V,M}};
  {
    for(j = 0 ; j < 3; j++)
    {
-     if (xInic + i < nL && yInic + j < nC)
-         m[xInic+i][yInic+j]=padrao[i][j];
+     if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
+         tabuleiro->m[xInic+i][yInic+j]=padrao[i][j];
    }
  }
 }
 
 ////////////////////////////////////////////////
-void inicLWSS(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
+void inicLWSS(Tab *tabuleiro, int xInic, int yInic)
 {
   char padrao[4][5]={{M,V,M,M,V},{V,M,M,M,M},{V,M,M,M,V},{V,V,V,V,M}};
   int i,j;
@@ -358,13 +524,13 @@ void inicLWSS(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
   {
     for(j = 0 ; j < 3; j++)
     {
-      if (xInic + i < nL && yInic + j < nC)
-          m[xInic+i][yInic+j]=padrao[i][j];
+      if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
+         tabuleiro->m[xInic+i][yInic+j]=padrao[i][j];
     }
   }
 }
 
-void inicAleat(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
+void inicAleat(Tab *tabuleiro, int xInic, int yInic)
 {
     int i , j , estado;
     srand(time(NULL));
@@ -373,18 +539,17 @@ void inicAleat(char m[ ][MAXC], int nL, int nC , int xInic, int yInic)
     {
       for(j = 0 ; j < 5 ; j++)
       {
-        if (xInic + i < nL && yInic + j < nC)
+        if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
         {
           estado = rand() % 2;
 
           if(estado == 1)
-            m[xInic + i][yInic + j] = 'X';
+            tabuleiro->m[xInic + i][yInic + j] = 'X';
 
           else
-            m[xInic + i][yInic + j] = '.';
+            tabuleiro->m[xInic + i][yInic + j] = '.';
         }
       }
 
     }
-    
-}
+} 
