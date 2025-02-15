@@ -56,6 +56,7 @@ void inicAleat(Tab *tabuleiro, int xInic, int yInic);
 int menuInicJogo(Tab *tabuleiro);
 void alocaMatriz(Tab *tabuleiro);
 void freeMatriz(Tab *tabuleiro);
+void ajustarPosicao(Tab *tabuleiro, int *xInic, int *yInic, int linhas, int colunas);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -96,7 +97,7 @@ int main()
 
       alocaMatriz(&tabuleiro);
 
-      printf("Digite quantas vezes deseja ver:\n");
+      printf("Digite quantos ciclos deseja ver:\n");
       scanf("%d" , &tabuleiro.ciclosVida);
 
       while(tabuleiro.ciclosVida <= 0)
@@ -152,7 +153,7 @@ int main()
             }
 
           }
-        }
+        
 
           printf("Deseja mudar a quantidade de ciclos?\n(1)Sim(2)Não\n");
           scanf("%d" , &opcaoCiclos);
@@ -176,7 +177,7 @@ int main()
           }
         }
       }
-   
+    }
 
    else
     printf("Encerrando programa\n");
@@ -219,6 +220,29 @@ void freeMatriz(Tab *matriz)
   }
 
   free(matriz->m);
+}
+
+void ajustarPosicao(Tab *tabuleiro, int *xInic, int *yInic, int linhas, int colunas)
+{
+  if (*xInic + linhas > tabuleiro->dim1) 
+  {
+    *xInic = tabuleiro->dim1 - linhas;
+  }
+
+  if (*xInic < 0) 
+  {
+    *xInic = 0;
+  }
+
+  if (*yInic + colunas > tabuleiro->dim2) 
+  {
+    *yInic = tabuleiro->dim2 - colunas;
+  }
+
+  if (*yInic < 0) 
+  {
+    *yInic = 0;
+  }
 }
 
 
@@ -432,6 +456,8 @@ void inicBloco(Tab *tabuleiro, int xInic, int yInic)
   char padrao[2][2] = {{V, V}, {V, V}};
   int i , j;
 
+  ajustarPosicao(tabuleiro , &xInic , &yInic , 2 , 2);
+
     for (i = 0; i < 2; i++)
     {
       for (j = 0; j < 2; j++)
@@ -448,6 +474,8 @@ void inicBote(Tab *tabuleiro, int xInic, int yInic)
   char padrao[3][3]={{V,V,M},{V,M,V},{M,V,M}};
   int i,j;
 
+  ajustarPosicao(tabuleiro , &xInic , &yInic , 3 , 3);
+
   for(i = 0; i < 3; i++)
   {
     for(j = 0 ; j < 3; j++)
@@ -460,23 +488,22 @@ void inicBote(Tab *tabuleiro, int xInic, int yInic)
 ////////////////////////////////////////////////
 void inicBlinker(Tab *tabuleiro, int xInic, int yInic)
 {
-  char padrao[1][3]={{V,V,V}};
-  int i , j;
+  char padrao[1][3] = {{V, V, V}};
+  int i, j;
 
-  if(xInic + 3 < tabuleiro->dim1 && yInic + 1 < tabuleiro->dim2)
-  { 
-    for(i = 0; i < 1; i++)
+  ajustarPosicao(tabuleiro , &xInic , &yInic , 1 , 3);
+
+  for(i = 0; i < 1; i++) 
+  {
+    for(j = 0; j < 3; j++) 
     {
-      for(j = 0 ; j < 3; j++)
-      {
-        if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
-          tabuleiro->m[xInic+i][yInic+j]=padrao[i][j];
-      }
+      if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2) 
+          tabuleiro->m[xInic + i][yInic + j] = padrao[i][j];
+      
     }
   }
-  else
-    printf("Não foi possível gerar\n");
 }
+
 
 
 ////////////////////////////////////////////////
@@ -486,11 +513,13 @@ void inicSapo(Tab *tabuleiro, int xInic, int yInic)
  char padrao[2][4]={{M,V,V,V},{V,V,V,M}};
   int i,j;
 
+  ajustarPosicao(tabuleiro , &xInic , &yInic , 2 , 4);
+
   for(i = 0; i < 2; i++)
   {
     for(j = 0 ; j < 4; j++)
     {
-      if (xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
+      if(xInic + i < tabuleiro->dim1 && yInic + j < tabuleiro->dim2)
          tabuleiro->m[xInic+i][yInic+j]=padrao[i][j];
     }
   }
@@ -503,6 +532,8 @@ void inicGlider(Tab *tabuleiro, int xInic, int yInic)
 {
 char padrao[3][3]={{V,V,V},{V,M,M},{M,V,M}};
  int i,j;
+
+ ajustarPosicao(tabuleiro , &xInic , &yInic , 3 , 3);
 
  for(i = 0; i < 3; i++)
  {
@@ -520,6 +551,8 @@ void inicLWSS(Tab *tabuleiro, int xInic, int yInic)
   char padrao[4][5]={{M,V,M,M,V},{V,M,M,M,M},{V,M,M,M,V},{V,V,V,V,M}};
   int i,j;
 
+  ajustarPosicao(tabuleiro , &xInic , &yInic , 4 , 5);
+
   for(i = 0; i < 3; i++)
   {
     for(j = 0 ; j < 3; j++)
@@ -534,6 +567,8 @@ void inicAleat(Tab *tabuleiro, int xInic, int yInic)
 {
     int i , j , estado;
     srand(time(NULL));
+
+    ajustarPosicao(tabuleiro , &xInic , &yInic , 5 , 5);
 
     for(i = 0 ; i < 5 ; i++)
     {
