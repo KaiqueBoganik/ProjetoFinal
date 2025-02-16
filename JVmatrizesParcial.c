@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include<stdlib.h>
 #include<time.h>
+#include<string.h>
 
 //windows-msvc-x64
 #define V 'X'
@@ -26,7 +27,6 @@
 typedef struct tab
 {
   char nomeJogo[TAM]; 
-  
   int ciclosVida; 
   int dim1,dim2; 
   char **m; 
@@ -57,6 +57,7 @@ int menuInicJogo(Tab *tabuleiro);
 void alocaMatriz(Tab *tabuleiro);
 void freeMatriz(Tab *tabuleiro);
 void ajustarPosicao(Tab *tabuleiro, int *xInic, int *yInic, int linhas, int colunas);
+void lerArquivo(Tab *tabuleiro, char *nomeArquivo);
 
 //////////////////////////////////////////////////////////////////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////////////////
@@ -72,7 +73,7 @@ int main()
    Tab tabuleiro;
    int continuar = 1 , escolha , opcaoInicio , opcaoTab , opcaoCiclos , op;
 
-   printf("Deseja inciar a simulação?\n Digite:\n(1)Sim(2)Não\n");
+   printf("Deseja inciar a simulação?\nDigite:\n(1)Sim(2)Não\n");
    scanf("%d" , &opcaoInicio);
 
    if(opcaoInicio == 1)
@@ -245,42 +246,83 @@ void ajustarPosicao(Tab *tabuleiro, int *xInic, int *yInic, int linhas, int colu
   }
 }
 
+void lerArquivo(Tab *tabuleiro, char *nomeArquivo)  
+{
+    FILE *arquivo;
+    char linha[100] , *separa;
+    int linhaTab = 0 , colunaTab;
+
+    arquivo = fopen(nomeArquivo, "r");
+
+    if(!arquivo) 
+    {
+        printf("Erro ao abrir o arquivo.\n");
+        return;
+    }
+
+    limpaMatriz(tabuleiro);
+
+    while(linhaTab < tabuleiro->dim1) 
+    {
+      if(!fgets(linha, sizeof(linha), arquivo)) 
+          break;
+
+      separa = strtok(linha, ",");
+
+      while(separa) 
+      {
+        colunaTab = atoi(separa) - 1;
+        if(colunaTab >= 0 && colunaTab < tabuleiro->dim2)
+              tabuleiro->m[linhaTab][colunaTab] = V;
+
+        separa = strtok(NULL, ",");
+      }
+      linhaTab++;
+    }
+
+    fclose(arquivo);
+}
 
 int menuInicJogo(Tab *tabuleiro)
 {
    int opcao , xInic , yInic;
+   char nomeArquivo[100];
 
    limpaMatriz(tabuleiro);
 
    printf("Qual padrão deseja executar?\n");
-   printf("(1)Bloco\n(2)Bote\n(3)Blinker\n(4)Sapo\n(5)Glider\n(6)LWSS\n(7)Padrão aleatorio\nEntre com a opcao: ");
+   printf("(1)Bloco\n(2)Bote\n(3)Blinker\n(4)Sapo\n(5)Glider\n(6)LWSS\n(7)Padrão aleatorio\n(8)Ler arquivo de dados.\nEntre com a opcao: ");
    scanf("%d", &opcao);
 
-   while(opcao < 1 || opcao > 7)
+   while(opcao < 1 || opcao > 8)
    {
       printf("Opção inválida. Digite novamenete\n");
       scanf("%d" , &opcao);
    }
 
-   printf("Digite a linha inicial:\n");
-   scanf("%d" , &xInic);
+  if(opcao < 8)
+  {
+    printf("Digite a linha inicial:\n");
+    scanf("%d" , &xInic);
 
-   while(xInic < 0 || xInic >= tabuleiro->dim1)
-   {
+    while(xInic < 0 || xInic >= tabuleiro->dim1)
+    {
       printf("Posição inválida. Digite novamente.\n");
       printf("Digite a linha inicial novamente\n");
       scanf("%d", &xInic);
-   }
+    }
 
-   printf("Digite a coluna inicia:\n");
-   scanf("%d", &yInic);
+    printf("Digite a coluna inicia:\n");
+    scanf("%d", &yInic);
 
-   while(yInic < 0 || yInic >= tabuleiro->dim2) 
-   {
+    while(yInic < 0 || yInic >= tabuleiro->dim2) 
+    {
       printf("Posição inválida. Digite novamente.\n");
       printf("Digite a coluna inicial novamente\n");
       scanf("%d", &yInic);
-   }
+    }
+
+  }
 
     switch(opcao)
     {
@@ -291,8 +333,18 @@ int menuInicJogo(Tab *tabuleiro)
       case 5: inicGlider(tabuleiro,xInic, yInic); break;
       case 6: inicLWSS(tabuleiro,xInic, yInic); break;
       case 7: inicAleat(tabuleiro,xInic, yInic); break;
+      /*case 8: printf("Digite o nome do arquivo:\n");
+              scanf("%s", nomeArquivo);
+              lerArquivo(tabuleiro, nomeArquivo); 
+              break;*/
     }
 
+    if(opcao == 8)
+    {
+      printf("Digite o nome do arquivo:\n ");
+      scanf("%s", nomeArquivo);
+      lerArquivo(tabuleiro, nomeArquivo); 
+    }
 
     imprimeMatriz(tabuleiro);
     printf("Se a inicializacao estiver correta digite qualquer tecla para iniciar o jogo...");
@@ -320,14 +372,14 @@ void imprimeMatriz(Tab *matriz)
     }
 }
 
-void copiaMatriz(Tab *mAterior , Tab *mAtual)
+void copiaMatriz(Tab *mAnterior , Tab *mAtual)
 {
     int i , j;
-    for(i = 0 ; i < mAterior->dim1 ; i++)
+    for(i = 0 ; i < mAnterior->dim1 ; i++)
     {
-        for(j = 0 ; j < mAterior->dim2 ; j++)
+        for(j = 0 ; j < mAnterior->dim2 ; j++)
         {
-          mAtual->m[i][j] = mAterior->m[i][j];
+          mAnterior->m[i][j] = mAtual->m[i][j];
         }
     }
 }
