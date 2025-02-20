@@ -268,22 +268,16 @@ void lerArquivo(Tab *tabuleiro, char *nomeArquivo, int xInic, int yInic)
       }
       
       linhasPadrao++;
-      j = 0;
+      colunasPadrao = 0;
 
       separa = strtok(linha, ",");
 
-      while (separa) 
+      while(separa) 
       {
-          j++;
+          colunasPadrao++;
           separa = strtok(NULL, ",");
       }
-
-      if (j > colunasPadrao) 
-      {
-          colunasPadrao = j; 
-      }
     }
-    printf("Linhas: %d\n Colunas:%d\n" , linhasPadrao , colunasPadrao);
 
     ajustarPosicao(tabuleiro, &xInic, &yInic, linhasPadrao, colunasPadrao);
 
